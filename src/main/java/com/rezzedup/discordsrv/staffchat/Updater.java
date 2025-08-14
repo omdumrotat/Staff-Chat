@@ -26,12 +26,11 @@ import com.github.zafarkhaja.semver.Version;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.rezzedup.discordsrv.staffchat.config.StaffChatConfig;
-import community.leaf.tasks.TaskContext;
+import com.github.Anon8281.universalScheduler.scheduling.tasks.MyScheduledTask;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
 import pl.tlinkowski.annotation.basic.NullOr;
 
 import java.net.URI;
@@ -49,7 +48,7 @@ public class Updater {
 	private final HttpClient client;
 	private final String userAgent;
 	
-	private @NullOr TaskContext<BukkitTask> task;
+	private @NullOr MyScheduledTask task;
 	private @NullOr Version latestAvailableVersion;
 	
 	Updater(StaffChatPlugin plugin) {
@@ -91,7 +90,7 @@ public class Updater {
 		if (plugin.config().getOrDefault(StaffChatConfig.UPDATE_CHECKER_ENABLED)) {
 			if (task == null || task.isCancelled()) {
 				plugin.debug(getClass()).log("Reload", () -> "Update checker enabled: starting task");
-				this.task = plugin.async().delay(10).ticks().every(7).hours().run(this::checkForUpdates);
+				this.task = plugin.scheduler().runTaskTimerAsynchronously(this::checkForUpdates, 10L, 20L * 60L * 60L * 7L); // 10 ticks delay, then every 7 hours
 			} else {
 				plugin.debug(getClass()).log("Reload", () -> "Update checker enabled: task already running");
 			}
@@ -130,7 +129,7 @@ public class Updater {
 				"Found latest available version: " + latestAvailableVersion + " (current: " + plugin.version() + ")"
 			);
 			
-			plugin.sync().run(() -> notifyIfUpdateAvailable(plugin.getServer().getConsoleSender()));
+			plugin.scheduler().runTask(() -> notifyIfUpdateAvailable(plugin.getServer().getConsoleSender()));
 		} catch (Exception e) {
 			plugin.debug(getClass()).logException("Update Check: Failure", e);
 		}

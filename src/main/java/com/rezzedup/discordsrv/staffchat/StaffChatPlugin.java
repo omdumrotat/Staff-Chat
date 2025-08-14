@@ -39,6 +39,8 @@ import community.leaf.configvalues.bukkit.YamlValue;
 import community.leaf.configvalues.bukkit.data.YamlDataFile;
 import community.leaf.eventful.bukkit.BukkitEventSource;
 import community.leaf.tasks.bukkit.BukkitTaskSource;
+import com.github.Anon8281.universalScheduler.UniversalScheduler;
+import com.github.Anon8281.universalScheduler.scheduling.schedulers.TaskScheduler;
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.Message;
 import github.scarsz.discordsrv.dependencies.jda.api.entities.TextChannel;
@@ -75,10 +77,14 @@ public class StaffChatPlugin extends JavaPlugin implements BukkitTaskSource, Buk
 	private @NullOr Updater updater;
 	private @NullOr MessageProcessor processor;
 	private @NullOr DiscordStaffChatListener discordSrvHook;
+	private @NullOr TaskScheduler scheduler;
 	
 	@Override
 	public void onEnable() {
 		this.version = Version.valueOf(getDescription().getVersion());
+		
+		// Initialize Folia-compatible scheduler
+		this.scheduler = UniversalScheduler.getScheduler(this);
 		
 		this.pluginDirectoryPath = getDataFolder().toPath();
 		this.backupsDirectoryPath = pluginDirectoryPath.resolve("backups");
@@ -189,6 +195,10 @@ public class StaffChatPlugin extends JavaPlugin implements BukkitTaskSource, Buk
 	
 	public Debugger.DebugLogger debug(Class<?> clazz) {
 		return debugger().debug(clazz);
+	}
+	
+	public TaskScheduler scheduler() {
+		return initialized(scheduler);
 	}
 	
 	public StaffChatConfig config() {
@@ -332,7 +342,7 @@ public class StaffChatPlugin extends JavaPlugin implements BukkitTaskSource, Buk
 		debug(getClass()).log("Metrics", () -> "Scheduling metrics to start one minute from now");
 		
 		// Start a minute later to get the most accurate data.
-		sync().delay(1).minutes().run(() ->
+		scheduler().runTaskLater(() ->
 		{
 			Metrics metrics = new Metrics(this, BSTATS);
 			
@@ -345,6 +355,6 @@ public class StaffChatPlugin extends JavaPlugin implements BukkitTaskSource, Buk
 			));
 			
 			debug(getClass()).log("Metrics", () -> "Started bStats metrics");
-		});
+		}, 20L * 60L); // 1 minute in ticks
 	}
 }

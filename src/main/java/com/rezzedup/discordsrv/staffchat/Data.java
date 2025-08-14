@@ -28,10 +28,9 @@ import com.rezzedup.discordsrv.staffchat.events.ReceivingStaffChatToggleEvent;
 import community.leaf.configvalues.bukkit.YamlValue;
 import community.leaf.configvalues.bukkit.data.YamlDataFile;
 import community.leaf.configvalues.bukkit.util.Sections;
-import community.leaf.tasks.TaskContext;
+import com.github.Anon8281.universalScheduler.scheduling.tasks.MyScheduledTask;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
 import pl.tlinkowski.annotation.basic.NullOr;
 
 import java.time.Instant;
@@ -47,7 +46,7 @@ public class Data extends YamlDataFile implements StaffChatData {
 	
 	private final StaffChatPlugin plugin;
 	
-	private @NullOr TaskContext<BukkitTask> task = null;
+	private @NullOr MyScheduledTask task = null;
 	
 	Data(StaffChatPlugin plugin) {
 		super(plugin.directory().resolve("data"), "staff-chat.data.yml");
@@ -67,11 +66,11 @@ public class Data extends YamlDataFile implements StaffChatData {
 		}
 		
 		// Start the save task.
-		task = plugin.async().every(2).minutes().run(() -> {
+		task = plugin.scheduler().runTaskTimerAsynchronously(() -> {
 			if (isUpdated()) {
 				save();
 			}
-		});
+		}, 20L * 120L, 20L * 120L); // Every 2 minutes in ticks
 		
 		// Update profiles of all online players when reloaded.
 		reloadsWith(() -> plugin.getServer().getOnlinePlayers().forEach(this::updateProfile));

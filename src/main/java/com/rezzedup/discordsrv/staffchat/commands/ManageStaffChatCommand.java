@@ -143,9 +143,9 @@ public class ManageStaffChatCommand implements CommandExecutor, TabCompleter {
 			
 			if (sender instanceof Player) {
 				sender.sendMessage(colorful("&9[Debug]&o Sending a test message..."));
-				plugin.sync().delay(10).ticks().run(() ->
+				plugin.scheduler().runTaskLater(() ->
 					plugin.getServer().dispatchCommand(sender, "staffchat Hello! Just testing things...")
-				);
+				, 10L);
 			}
 		} else {
 			sender.sendMessage(colorful("&9[Debug] &4→ &cDisabled debugging"));

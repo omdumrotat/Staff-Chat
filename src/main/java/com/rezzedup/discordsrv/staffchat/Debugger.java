@@ -117,10 +117,10 @@ public class Debugger {
 		}
 		
 		// Log status directly on the next tick.
-		plugin.sync().run(() -> logPluginStatus(clazz, context + " (Initial)"));
+		plugin.scheduler().runTask(() -> logPluginStatus(clazz, context + " (Initial)"));
 		
 		// Log status 30 seconds after so that DiscordSRV has a chance to connect.
-		plugin.sync().delay(30).seconds().run(() -> logPluginStatus(clazz, context + " (30 Seconds)"));
+		plugin.scheduler().runTaskLater(() -> logPluginStatus(clazz, context + " (30 Seconds)"), 20L * 30L);
 	}
 	
 	private void logPluginStatus(Class<?> clazz, String context) {

@@ -109,6 +109,6 @@ public class PlayerPrefixedMessageListener implements Listener {
 		);
 		
 		// Handle this on the main thread next tick.
-		plugin.sync().run(() -> plugin.submitMessageFromPlayer(player, submission));
+		plugin.scheduler().runTask(() -> plugin.submitMessageFromPlayer(player, submission));
 	}
 }

@@ -40,7 +40,7 @@ public class DiscordStaffChatListener {
 			event.setCancelled(true); // Cancel this message from getting sent to global chat.
 			
 			// Handle this on the main thread next tick.
-			plugin.sync().run(() -> plugin.submitMessageFromDiscord(event.getAuthor(), event.getMessage()));
+			plugin.scheduler().runTask(() -> plugin.submitMessageFromDiscord(event.getAuthor(), event.getMessage()));
 		}
 	}
 }

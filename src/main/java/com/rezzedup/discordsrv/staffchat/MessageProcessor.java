@@ -167,7 +167,7 @@ public class MessageProcessor {
 		if (plugin.isDiscordSrvHookEnabled()) {
 			sendToDiscord(channel -> {
 				// Send to discord off the main thread (just like DiscordSRV does)
-				plugin.async().run(() ->
+				plugin.scheduler().runTaskAsynchronously(() ->
 					DiscordSRV.getPlugin().processChatMessage(author, message, StaffChatPlugin.CHANNEL, false)
 				);
 			});

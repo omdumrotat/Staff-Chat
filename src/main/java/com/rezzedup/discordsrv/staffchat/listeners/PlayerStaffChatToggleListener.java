@@ -68,7 +68,7 @@ public class PlayerStaffChatToggleListener implements Listener {
 			);
 			
 			// Handle this on the main thread next tick.
-			plugin.sync().run(() -> plugin.submitMessageFromPlayer(event.getPlayer(), event.getMessage()));
+			plugin.scheduler().runTask(() -> plugin.submitMessageFromPlayer(event.getPlayer(), event.getMessage()));
 		} else {
 			plugin.debug(getClass()).log(event, () ->
 				"Player " + player.getName() + " has automatic staff-chat enabled " +
@@ -76,7 +76,7 @@ public class PlayerStaffChatToggleListener implements Listener {
 			);
 			
 			// Remove this non-staff profile (but in sync 'cus it calls an event).
-			plugin.sync().run(() -> {
+			plugin.scheduler().runTask(() -> {
 				plugin.data().updateProfile(player);
 				player.chat(event.getMessage());
 			});

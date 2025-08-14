@@ -89,14 +89,20 @@ public class JoinNotificationListener implements Listener {
 			return;
 		}
 		
-		plugin.sync().delay(10).ticks().every(10).ticks().run(task ->
-		{
+		com.github.Anon8281.universalScheduler.scheduling.tasks.MyScheduledTask reminderTask = plugin.scheduler().runTaskTimer(() -> {
 			if (reminders.isEmpty()) {
-				task.cancel();
-			} else {
-				reminders.pop().run();
+				// Task will stop automatically when this condition is met
+				return; 
 			}
-		});
+			reminders.pop().run();
+		}, 10L, 10L); // 10 ticks delay, 10 ticks interval
+		
+		// Cancel the task when reminders are empty (fallback safety)
+		plugin.scheduler().runTaskLater(() -> {
+			if (reminders.isEmpty() && !reminderTask.isCancelled()) {
+				reminderTask.cancel();
+			}
+		}, 200L); // Check after 10 seconds
 	}
 	
 	@EventListener(ListenerOrder.EARLY)
